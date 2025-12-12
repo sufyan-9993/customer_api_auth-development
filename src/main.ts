@@ -19,7 +19,11 @@ async function bootstrap() {
     }),
   );
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('port') || 3000;
+  // Render provides PORT env automatically
+  const port = process.env.PORT
+    ? Number(process.env.PORT)
+    : configService.get<number>('port') || 3000;
+
   const environment = configService.get<string>('nodeEnv') || 'development';
 
   // Set global API prefix
@@ -48,7 +52,8 @@ async function bootstrap() {
   logger.log(`Application starting in ${environment} environment`);
 
   try {
-    await app.listen(port);
+    await app.listen(port, '0.0.0.0');
+
     logger.log(`Application is running on port ${port}`);
     logger.log(
       `Swagger documentation available at http://localhost:${port}/api/docs`,
